@@ -1,0 +1,14 @@
+{
+  "id": "open-saber.registry.read",
+  "ver": "1.0",
+  "ets": "11234",
+  "params": {
+    "did": "",
+    "key": "",
+    "msgid": ""
+  },
+  "request": {
+    "osid": "osid_input",
+    "includeSignatures": true
+  }
+}

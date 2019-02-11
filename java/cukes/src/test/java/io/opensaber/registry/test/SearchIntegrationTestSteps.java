@@ -1,3 +1,4 @@
+/*
 package io.opensaber.registry.test;
 
 import static org.junit.Assert.*;
@@ -59,9 +60,11 @@ public class SearchIntegrationTestSteps extends RegistryTestBase implements En {
 		headers.add("x-authenticated-user-token", accessToken);
 	}
 
-	/**
+	*/
+/**
 	 * Cucumber Background steps which will be executed before each test
-	 */
+	 *//*
+
 	private void backgroundStepsForEachTest() {
 		Given("a record to add$", () -> {
 			setJsonld(VALID_JSONLD_FILE);
@@ -162,3 +165,4 @@ public class SearchIntegrationTestSteps extends RegistryTestBase implements En {
 	}
 
 }
+*/

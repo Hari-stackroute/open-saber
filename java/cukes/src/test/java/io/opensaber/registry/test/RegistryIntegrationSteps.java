@@ -3,17 +3,19 @@ package io.opensaber.registry.test;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 
 import cucumber.api.java.Before;
@@ -26,22 +28,18 @@ import io.opensaber.pojos.Response.Status;
 
 public class RegistryIntegrationSteps extends RegistryTestBase {
 
-	// private static final String VALID_NEWJSONLD= "newSchool.jsonld";
-	private static final String VALID_NEWJSONLD = "teacher.jsonld";
+	// private static final String TEACHER_JSONLD= "newSchool.jsonld";
+	private static final String TEACHER_JSONLD = "teacher.jsonld";
 	private static final String ENTITY_JSONLD = "basicProficiencyLevel.jsonld";
 	private static final String INVALID_LABEL_JSONLD = "invalid-label.jsonld";
 	private static final String INVALID_REQUESTID_JSONLD = "invalid_request_id_teacher.jsonld";
 	private static final String INVALID_NEWJSONLD = "invalid-teacher.jsonld";
-	private static final String ADD_ENTITY = "add";
-	private static final String READ_ENTITY = "read";
-	private static final String AUTH_HEADER_NAME = "x-authenticated-user-token";
+
 	Type type = new TypeToken<Map<String, String>>() {
 	}.getType();
 	private RestTemplate restTemplate;
-	private String baseUrl;
-	private ResponseEntity<Response> response;
+
 	private String id;
-	private HttpHeaders headers;
 	private String updateId;
 
 	@Before
@@ -52,8 +50,8 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 
 	@Given("^a valid record")
 	public void jsonldData() {
-		setJsonld(VALID_NEWJSONLD);
-		id = setJsonldWithNewRootLabel();
+		setJsonld(TEACHER_JSONLD);
+		//id = setJsonldWithNewRootLabel();
 		assertNotNull(jsonld);
 	}
 
@@ -153,23 +151,13 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 	}
 
 	@And("^fetching the record from the registry should match the issued record")
-	public void fetchRecordFromRegistryAndVerify() throws JsonParseException, JsonMappingException, IOException {
+	/*public void fetchRecordFromRegistryAndVerify() throws JsonParseException, JsonMappingException, IOException {
 		setValidAuthToken();
 		response = callRegistryReadAPI();
 		checkForIsomorphicModel();
-	}
+	}*/
 
-	private void checkSuccessfulResponse() throws JsonParseException, JsonMappingException, IOException {
-		Status responseStatus = response.getBody().getParams().getStatus();
-		assertEquals(Response.Status.SUCCESSFUL, responseStatus);
-	}
-
-	private void checkUnsuccessfulResponse() throws JsonParseException, JsonMappingException, IOException {
-		Status responseStatus = response.getBody().getParams().getStatus();
-		assertEquals(Response.Status.UNSUCCESSFUL, responseStatus);
-	}
-
-	private void checkForIsomorphicModel() throws IOException {
+	/*private void checkForIsomorphicModel() throws IOException {
 		Model expectedModel = ModelFactory.createDefaultModel();
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonldBody = mapper.readTree(jsonld).path("request").toString();
@@ -180,21 +168,7 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 		RDFDataMgr.read(actualModel, new StringReader(newJsonld), null, org.apache.jena.riot.RDFLanguages.JSONLD);
 		assertTrue(expectedModel.isIsomorphicWith(actualModel));
 	}
-
-	private void setValidAuthHeader() {
-		headers = new HttpHeaders();
-		headers.add(AUTH_HEADER_NAME, accessToken);
-	}
-
-	public HttpHeaders getHeaders() {
-
-		return headers;
-	}
-
-	private void setInvalidAuthHeader() {
-		headers = new HttpHeaders();
-		headers.add(AUTH_HEADER_NAME, "1234");
-	}
+*/
 
 	@Given("(.*) record issued into the registry")
 	public void issueRecordInRegistry(String qualifier) throws JsonParseException, JsonMappingException, IOException {
@@ -210,11 +184,6 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 		assertEquals(message, response.getBody().getParams().getErrmsg());
 	}
 
-	@Given("^a non existent record id$")
-	public void a_non_existent_record_id() throws Exception {
-		id = generateRandomId();
-	}
-
 	@When("^the auth token is invalid")
 	public void auth_token_is_invalid() {
 		setInvalidAuthToken();
@@ -223,19 +192,6 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 	@When("^the auth token is missing")
 	public void auth_token_is_missing() {
 		headers = new HttpHeaders();
-	}
-
-	@When("^retrieving the record from the registry$")
-	public void retrieving_the_record_from_the_registry() {
-		response = callRegistryReadAPI();
-	}
-
-	private ResponseEntity<Response> callRegistryReadAPI() {
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		ResponseEntity<Response> response = restTemplate.exchange(baseUrl + READ_ENTITY + "/" + id, HttpMethod.GET,
-				entity, Response.class);
-		return response;
-
 	}
 
 	@Then("^record retrieval should be unsuccessful$")
@@ -252,35 +208,18 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 		// assertNotNull(jsonld);
 	}
 
-	@Then("^record retrieval should be successful$")
-	public void record_retrieval_should_be_successful() throws Exception {
-		checkSuccessfulResponse();
-	}
-
 	@Then("^the record should match$")
 	public void the_record_should_match() throws Exception {
-		checkForIsomorphicModel();
+		//checkForIsomorphicModel();
 	}
 
 	@Given("^a response")
 	public void validResponseFormat() {
 		try {
-			setJsonld(VALID_NEWJSONLD);
+			setJsonld(TEACHER_JSONLD);
 			id = setJsonldWithNewRootLabel();
 			setValidAuthHeader();
 			response = callRegistryCreateAPI();
-		} catch (Exception e) {
-			response = null;
-		}
-		assertNotNull(response);
-	}
-
-	@Given("^a read response")
-	public void validReadResponseFormat() {
-		try {
-			id = generateRandomId();
-			setValidAuthHeader();
-			response = callRegistryReadAPI();
 		} catch (Exception e) {
 			response = null;
 		}
@@ -305,16 +244,5 @@ public class RegistryIntegrationSteps extends RegistryTestBase {
 	@Then("^the response format should be successful")
 	public void response_successful() throws Exception {
 		assertEquals(true, response != null);
-	}
-
-	@Then("^record should never have any associated audit info$")
-	public void test_audit_record_unexpected_in_read() throws Exception {
-		response = callRegistryReadAPI();
-		Map<String, Object> map = (Map) response.getBody().getResult();
-		if (map.containsKey("(?i)(?<= |^)audit(?= |$)")) {
-			checkUnsuccessfulResponse();
-		} else {
-			checkSuccessfulResponse();
-		}
 	}
 }

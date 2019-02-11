@@ -230,7 +230,7 @@ public class RegistryController {
 
         } catch (Exception e) {
             logger.error("Read Api Exception occurred ", e);
-            responseParams.setErr(e.getMessage());
+            responseParams.setErrmsg(e.getMessage());
             responseParams.setStatus(Response.Status.UNSUCCESSFUL);
         }
 

@@ -1,3 +1,4 @@
+/*
 package io.opensaber.registry.test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +12,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -41,10 +43,12 @@ public class UpdateIntegrationTestSteps extends RegistryTestBase implements En {
 	private String id;
 	private HttpHeaders headers;
 
-	/**
+	*/
+/**
 	 * The list of integration test scenarios that will be run as part of the update
 	 * feature integration test
-	 */
+	 *//*
+
 	public UpdateIntegrationTestSteps() {
 		initialize();
 		initializeCommonSteps();
@@ -63,9 +67,11 @@ public class UpdateIntegrationTestSteps extends RegistryTestBase implements En {
 		headers.add("x-authenticated-user-token", accessToken);
 	}
 
-	/**
+	*/
+/**
 	 * All the reusable step definitions should go here
-	 */
+	 *//*
+
 	private void initializeCommonSteps() {
 
 		When("^updating the record in the registry$", () -> {
@@ -148,9 +154,11 @@ public class UpdateIntegrationTestSteps extends RegistryTestBase implements En {
 		});
 	}
 
-	/**
+	*/
+/**
 	 * Cucumber Background steps which will be executed before each test
-	 */
+	 *//*
+
 	private void backgroundStepsForEachTest() {
 		Given("a valid entity record$", () -> {
 			setJsonld(VALID_JSONLD_FILE);
@@ -218,3 +226,4 @@ public class UpdateIntegrationTestSteps extends RegistryTestBase implements En {
 	}
 
 }
+*/

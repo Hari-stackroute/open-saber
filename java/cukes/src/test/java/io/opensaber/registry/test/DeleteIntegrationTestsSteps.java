@@ -1,3 +1,4 @@
+/*
 package io.opensaber.registry.test;
 
 import static org.junit.Assert.assertEquals;
@@ -24,10 +25,12 @@ public class DeleteIntegrationTestsSteps extends RegistryTestBase implements En 
 	private ResponseEntity<Response> response;
 	private HttpHeaders headers;
 
-	/**
+	*/
+/**
 	 * The list of integration test scenarios that will be run as part of the update
 	 * feature integration test
-	 */
+	 *//*
+
 	public DeleteIntegrationTestsSteps() {
 		initialize();
 		initializeCommonSteps();
@@ -46,9 +49,11 @@ public class DeleteIntegrationTestsSteps extends RegistryTestBase implements En 
 		headers.add("x-authenticated-user-token", accessToken);
 	}
 
-	/**
+	*/
+/**
 	 * All the reusable step definitions should go here
-	 */
+	 *//*
+
 	private void initializeCommonSteps() {
 		Given("^delete the record in the registry$", () -> {
 			StringBuilder url = new StringBuilder();
@@ -59,21 +64,25 @@ public class DeleteIntegrationTestsSteps extends RegistryTestBase implements En 
 		Then("^deleted record should be unsuccessful$", () -> checkUnsuccessfulResponse());
 		And("^delete api error message is (.*)$", (String errorMsg) -> verifyUnsuccessfulMessage(errorMsg));
 
-		/*
+		*/
+/*
 		 * Given("^delete record with connected nodes are active$", () -> {
 		 * StringBuilder url = new StringBuilder();
 		 * url.append(baseUrl).append(DELETE_REST_ENDPOINT).append("/").append(
 		 * "DisabilityCode-NA"); response = delete(url.toString(),headers); });
-		 */
+		 *//*
+
 		Then("^deleted record should be successful$", () -> checkSuccessfulResponse());
 		And("^delete api error message when parent record active is (.*)$",
 				(String errorMsg) -> verifyUnsuccessfulMessageWhenParentNodeIsActive(errorMsg));
 
 	}
 
-	/**
+	*/
+/**
 	 * Cucumber Background steps which will be executed before each test
-	 */
+	 *//*
+
 	private void backgroundStepsForEachTest() {
 		Given("a valid create entity record$", () -> {
 			setJsonld(VALID_JSONLD_FILE);
@@ -118,4 +127,4 @@ public class DeleteIntegrationTestsSteps extends RegistryTestBase implements En 
 		});
 	}
 
-}
+}*/

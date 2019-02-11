@@ -1,5 +1,7 @@
 package io.opensaber.registry.test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -14,12 +16,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import io.opensaber.pojos.Response;
+
+import static org.junit.Assert.assertEquals;
 
 public class RegistryTestBase {
 
@@ -36,7 +45,12 @@ public class RegistryTestBase {
 	private static String ssoRealm = System.getenv("sunbird_sso_realm");
 	public static String accessToken = generateAuthToken();
 	public String jsonld;
-	protected RestTemplate restTemplate;
+	public RestTemplate restTemplate;
+	public HttpHeaders headers;
+	protected String baseUrl;
+	public ResponseEntity<Response> response;
+	protected static final String AUTH_HEADER_NAME = "x-authenticated-user-token";
+	public static final String ADD_ENTITY = "add";
 
 	public static String extractIdWithoutContext(String label) {
 		String extractedId = label;
@@ -153,12 +167,10 @@ public class RegistryTestBase {
 		return response;
 	}
 
-	public ResponseEntity<Response> readEntity(String url, HttpHeaders headers, String id) {
+	public ResponseEntity<Response> readEntity(String url, HttpHeaders headers) {
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		Map<String, String> queryParams = new HashMap<String, String>();
-		queryParams.put("id", id);
-		ResponseEntity<Response> response = restTemplate.exchange(url, HttpMethod.GET, entity, Response.class,
-				queryParams);
+		ResponseEntity<Response> response = restTemplate.postForEntity(url, entity, Response.class);
 		return response;
 	}
 
@@ -166,6 +178,30 @@ public class RegistryTestBase {
 		HttpEntity<String> entity = new HttpEntity<>(jsonldData, headers);
 		ResponseEntity<Response> response = restTemplate.postForEntity(url, entity, Response.class);
 		return response;
+	}
+
+	protected void checkSuccessfulResponse() throws JsonParseException, JsonMappingException, IOException {
+		Response.Status responseStatus = response.getBody().getParams().getStatus();
+		assertEquals(Response.Status.SUCCESSFUL, responseStatus);
+	}
+
+	protected void checkUnsuccessfulResponse() throws JsonParseException, JsonMappingException, IOException {
+		Response.Status responseStatus = response.getBody().getParams().getStatus();
+		assertEquals(Response.Status.UNSUCCESSFUL, responseStatus);
+	}
+
+	protected void setValidAuthHeader() {
+		headers = new HttpHeaders();
+		headers.add(AUTH_HEADER_NAME, accessToken);
+	}
+
+	public HttpHeaders getHeaders() {
+		return headers;
+	}
+
+	protected void setInvalidAuthHeader() {
+		headers = new HttpHeaders();
+		headers.add(AUTH_HEADER_NAME, "1234");
 	}
 
 }
