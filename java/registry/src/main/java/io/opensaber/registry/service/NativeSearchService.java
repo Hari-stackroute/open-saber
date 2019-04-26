@@ -88,6 +88,13 @@ public class NativeSearchService implements ISearchService {
 
 			// TODO: parallel search.
 			shardManager.activateShard(dbConnection.getShardId());
+
+			//
+			if (dbProvider.getProvider().name().equalsIgnoreCase(Constants.GraphDatabaseProvider.CASSANDRA.getName())) {
+
+			} else {
+
+			}
 			IRegistryDao registryDao = new RegistryDaoImpl(shard.getDatabaseProvider(), definitionsManager, uuidPropertyName);
 			SearchDaoImpl searchDao = new SearchDaoImpl(registryDao);
 			try (OSGraph osGraph = shard.getDatabaseProvider().getOSGraph()) {

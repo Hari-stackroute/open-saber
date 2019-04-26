@@ -74,4 +74,8 @@ public class CassandraReader {
         JsonNode jsonNode = new ObjectMapper().convertValue(responseMap, JsonNode.class);
         return jsonNode;
     }
+
+    search() {
+
+    }
 }

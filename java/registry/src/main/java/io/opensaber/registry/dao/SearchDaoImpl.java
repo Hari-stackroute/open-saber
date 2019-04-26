@@ -17,6 +17,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.janusgraph.core.JanusGraph;
 
 public class SearchDaoImpl implements SearchDao {
     private IRegistryDao registryDao;
@@ -27,18 +28,23 @@ public class SearchDaoImpl implements SearchDao {
 
     public JsonNode search(Graph graphFromStore, SearchQuery searchQuery) {
 
-        GraphTraversalSource dbGraphTraversalSource = graphFromStore.traversal().clone();
+        //GraphTraversalSource dbGraphTraversalSource = graphFromStore.traversal().clone();
         List<Filter> filterList = searchQuery.getFilters();
         int offset = searchQuery.getOffset();
         ObjectNode resultNode = JsonNodeFactory.instance.objectNode();
         for (String entity : searchQuery.getEntityTypes()) {
-            GraphTraversal<Vertex, Vertex> resultGraphTraversal = dbGraphTraversalSource.clone().V().hasLabel(entity)
-                    .range(offset, offset + searchQuery.getLimit()).limit(searchQuery.getLimit());
-            GraphTraversal<Vertex, Vertex> parentTraversal = resultGraphTraversal.asAdmin().clone();
+            if(graphFromStore instanceof JanusGraph) {
+                CassandraReader cassandraReader = new CassandraReader();
+            } else {
+                GraphTraversalSource dbGraphTraversalSource = graphFromStore.traversal().clone();
+                GraphTraversal<Vertex, Vertex> resultGraphTraversal = dbGraphTraversalSource.clone().V().hasLabel(entity)
+                        .range(offset, offset + searchQuery.getLimit()).limit(searchQuery.getLimit());
+                GraphTraversal<Vertex, Vertex> parentTraversal = resultGraphTraversal.asAdmin().clone();
+                resultGraphTraversal = getFilteredResultTraversal(resultGraphTraversal, filterList);
+                JsonNode result = getResult(graphFromStore, resultGraphTraversal, parentTraversal);
+                resultNode.set(entity, result);
+            }
 
-            resultGraphTraversal = getFilteredResultTraversal(resultGraphTraversal, filterList);
-            JsonNode result = getResult(graphFromStore, resultGraphTraversal, parentTraversal);
-            resultNode.set(entity, result);
         }
 
         return resultNode;
